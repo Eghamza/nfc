@@ -1,0 +1,32 @@
+<!-- templates/employees/register_employee.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register Employee</title>
+</head>
+<body>
+    <h2>Register Employee</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register</button>
+    </form>
+    <h3>Read NFC UID</h3>
+    <button type="button" onclick="readNFC()">Read NFC UID</button>
+    <p id="nfc_uid_display"></p>
+    <script>
+        function readNFC() {
+            fetch('/employees/read_nfc_uid/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.nfc_uid) {
+                        document.getElementById('id_nfc_uid').value = data.nfc_uid;
+                        document.getElementById('nfc_uid_display').innerText = 'NFC UID: ' + data.nfc_uid;
+                    } else {
+                        alert('Error reading NFC UID: ' + data.error);
+                    }
+                });
+        }
+    </script>
+</body>
+</html>

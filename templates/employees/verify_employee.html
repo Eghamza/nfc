@@ -1,0 +1,40 @@
+<!-- templates/employees/verify_employee.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify Employee</title>
+</head>
+<body>
+    <h2>Verify Employee</h2>
+    <button type="button" onclick="verifyNFC()">Verify NFC UID</button>
+    <p id="verification_result"></p>
+    <script>
+        function verifyNFC() {
+            fetch('/employees/read_nfc_uid/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.nfc_uid) {
+                        fetch('/employees/verify_employee/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: 'nfc_uid=' + data.nfc_uid
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                document.getElementById('verification_result').innerText = 'Employee verified: ' + data.employee.name + ' (' + data.employee.email + ')';
+                            } else {
+                                document.getElementById('verification_result').innerText = 'Verification failed: ' + data.message;
+                            }
+                        });
+                    } else {
+                        document.getElementById('verification_result').innerText = 'Error reading NFC UID: ' + data.error;
+                    }
+                });
+        }
+    </script>
+</body>
+</html>
